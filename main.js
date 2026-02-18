@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     let currentWave = 'sine';
     let synthMode = "Additive";
     const synthModes = ["Additive","AM","FM"];
-    const toggleBtn = document.getElementById('toggle-btn');
     let attackTime = 0.5;
     const decayTime = 0.2;
     const sustainVal = 0.3;
@@ -20,14 +19,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     globalGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
     globalGain.connect(audioCtx.destination);
 
-    toggleBtn.addEventListener('click', () => {
-        if (currentWave === 'sine') {
-            currentWave = 'sawtooth';
-            toggleBtn.textContent = 'Switch to Sine';
-        } else {
-            currentWave = 'sine';
-            toggleBtn.textContent = 'Switch to Sawtooth';
-        }
+    const waveSelect = document.getElementById('wave-select');
+    waveSelect.addEventListener('change', () => {
+        currentWave = waveSelect.value;
     });
 
     const attackSlider = document.getElementById('attack-slider');
@@ -204,7 +198,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
             var carrier = audioCtx.createOscillator();
             var modulatorFreq = audioCtx.createOscillator();
             modulatorFreq.frequency.value = 100;
-            carrier.frequency.setValueAtTime(keyboardFrequencyMap[key], now);
+
+            const useLowCarrier = document.getElementById('carrier-toggle').checked;
+            carrier.frequency.setValueAtTime(useLowCarrier ? 1 : keyboardFrequencyMap[key], now);
             carrier.type = currentWave;
         
             const modulated = audioCtx.createGain();
@@ -218,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             
             var lfo = audioCtx.createOscillator();
             lfo.frequency.value = lfoFreqVal;
-            lfoGain = audioCtx.createGain();
+            var lfoGain = audioCtx.createGain();
             lfoGain.gain.value = 100;
             lfo.connect(lfoGain).connect(modulatorFreq.frequency);
             lfo.start();
@@ -232,14 +228,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
             lfos.push(lfo);
         } else if (synthMode === "FM") {
             var carrier = audioCtx.createOscillator();
-            modulatorFreq = audioCtx.createOscillator();
+            var modulatorFreq = audioCtx.createOscillator();
             const freq = keyboardFrequencyMap[key];
             
 
             carrier.frequency.setValueAtTime(freq, now);
             modulatorFreq.frequency.setValueAtTime(freq * modRatio, now);
 
-            modulationIndex = audioCtx.createGain();
+            var modulationIndex = audioCtx.createGain();
             modulationIndex.gain.value = freq*modRatio*indexAmount;
 
             modulatorFreq.connect(modulationIndex);

@@ -3,13 +3,18 @@
 
     <head>
         <meta charset="utf-8">
-        <title>Web Audio</title>
+        <title>Piano 2</title>
         <style></style>
     </head>
 
     <body>
-        <p>Change between sine and sawtoothq</p>
-        <button id="toggle-btn">Switch to Sawtooth</button>
+        <p>Change Wave Form</p>
+        <select id="wave-select">
+            <option value="sine">Sine</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="triangle">Triangle</option>
+            <option value="square">Square</option>
+        </select>
         <button id="modeToggle">Mode: Addition</button>
         <div id="smiley" style="font-size: 5em; text-align: center; margin: 1em;">:)</div>
         <div style="display: flex; gap: 20px; align-items: center;">
@@ -24,6 +29,9 @@
         </div>
         <p>LFO Frequency</p>
         <input type="range" id="lfo-slider" min="0.1" max="20" step="0.1" value="2">
+        <label>
+            <input type="checkbox" id="carrier-toggle"> Low carrier mode
+        </label>
         <p>Partials Slider</p>
         <input type="range" id="partials-slider" min="1" max="5" step="1" value="3">
         <p>FM Modulation Index</p>
