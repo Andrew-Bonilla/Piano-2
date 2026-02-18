@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const modRatio = 2;
     let indexAmount = 30;
     let lfoFreqVal = 2;
+    let amModFreq = 100;
+    let amDepth = 0.5;
     let numPartials = 2;
 
     const smileyList = [":)", ":D", "C:", ":/", "/:", ";)", ":P", "XD", ":-O", "B)", "<3"];
@@ -48,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         updateFreq(lfoSlider.value);
     });
+
     function updateFreq(val) {
         lfoFreqVal = val;
 
@@ -61,6 +64,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         })
     };
+
+    const amModSlider = document.getElementById('am-mod-slider');
+    amModSlider.addEventListener('input', () => {
+        amModFreq = parseFloat(amModSlider.value);
+    });
+
+    const amDepthSlider = document.getElementById('am-depth-slider');
+    amDepthSlider.addEventListener('input', () => {
+        amDepth = parseFloat(amDepthSlider.value);
+    });
 
     const partialsSlider = document.getElementById('partials-slider');
     partialsSlider.addEventListener('input', () => {
@@ -197,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         } else if (synthMode === "AM") {
             var carrier = audioCtx.createOscillator();
             var modulatorFreq = audioCtx.createOscillator();
-            modulatorFreq.frequency.value = 100;
+            modulatorFreq.frequency.value = amModFreq;
 
             const useLowCarrier = document.getElementById('carrier-toggle').checked;
             carrier.frequency.setValueAtTime(useLowCarrier ? 1 : keyboardFrequencyMap[key], now);
@@ -205,10 +218,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
         
             const modulated = audioCtx.createGain();
             const depth = audioCtx.createGain();
-            depth.gain.value = 0.5 //scale modulator output to [-0.5, 0.5]
-            modulated.gain.value = 1.0 - depth.gain.value; //a fixed value of 0.5
+            depth.gain.value = amDepth
+            modulated.gain.value = 1.0 - amDepth;
         
-            modulatorFreq.connect(depth).connect(modulated.gain); //.connect is additive, so with [-0.5,0.5] and 0.5, the modulated signal now has output gain at [0,1]
+            modulatorFreq.connect(depth).connect(modulated.gain); 
             carrier.connect(modulated)
             modulated.connect(gainNode);
             
