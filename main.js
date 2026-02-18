@@ -47,32 +47,46 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     const lfoSlider = document.getElementById('lfo-slider');
     lfoSlider.addEventListener('input', () => {
-
         updateFreq(lfoSlider.value);
     });
 
     function updateFreq(val) {
         lfoFreqVal = val;
 
-        Object.keys(activeOscillators).forEach(key => {            const data = activeOscillators[key];
-            const gainNode = data[1];
-            const oscillators = data[0];
+        Object.keys(activeOscillators).forEach(key => {            
+            const data = activeOscillators[key];
             const lfos = data[2];
             if (lfos.length > 0) {
                 lfos[0].frequency.value = val;
             }
-
         })
     };
 
     const amModSlider = document.getElementById('am-mod-slider');
     amModSlider.addEventListener('input', () => {
         amModFreq = parseFloat(amModSlider.value);
+
+        Object.keys(activeOscillators).forEach(key => {            
+            const data = activeOscillators[key];
+            const mod = data[6];
+            if (mod) {
+                mod.frequency.value = amModSlider.value;
+            }
+        })
     });
 
     const amDepthSlider = document.getElementById('am-depth-slider');
     amDepthSlider.addEventListener('input', () => {
         amDepth = parseFloat(amDepthSlider.value);
+        Object.keys(activeOscillators).forEach(key => {            
+            const data = activeOscillators[key];
+            const depth = data[4];
+            const mod = data[5];
+            if (depth) {
+                depth.gain.value = amDepthSlider.value;
+                mod.gain.value = 1.0 - amDepthSlider.value;
+            }
+        })
     });
 
     const partialsSlider = document.getElementById('partials-slider');
@@ -83,7 +97,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const indexSlider = document.getElementById('index-slider');
     indexSlider.addEventListener('input', () => {
         indexAmount = parseFloat(indexSlider.value);
-        Object.keys(activeOscillators).forEach(key => {            const data = activeOscillators[key];
+        Object.keys(activeOscillators).forEach(key => {            
+            const data = activeOscillators[key];
             
             const mods = data[3];
             if (mods.length > 0) {
@@ -182,6 +197,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         let oscillators = [];
         let lfos = [];
         let FMmodulators = [];
+        let AMdepthGain;
+        let AMmodulated;
+        let AMmodulatorFreq;
         if (synthMode === "Additive") {
             const allPartials = [
                 {ratio:1, amp:0.6},
@@ -238,6 +256,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
             oscillators.push(carrier);
             oscillators.push(modulatorFreq);
             oscillators.push(lfo);
+            AMdepthGain = depth
+            AMmodulated = modulated;
+            AMmodulatorFreq = modulatorFreq;
             lfos.push(lfo);
         } else if (synthMode === "FM") {
             var carrier = audioCtx.createOscillator();
@@ -266,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
 
 
-        activeOscillators[key] = [oscillators, gainNode, lfos, FMmodulators];
+        activeOscillators[key] = [oscillators, gainNode, lfos, FMmodulators, AMdepthGain, AMmodulated, AMmodulatorFreq];
         
         
     }
